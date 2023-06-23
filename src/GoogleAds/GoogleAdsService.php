@@ -10,6 +10,8 @@ use Google\Ads\GoogleAds\Lib\V14\GoogleAdsServerStreamDecorator;
 use Google\Ads\GoogleAds\V14\Common\CrmBasedUserListInfo;
 use Google\Ads\GoogleAds\V14\Common\CustomerMatchUserListMetadata;
 use Google\Ads\GoogleAds\V14\Common\ExpressionRuleUserListInfo;
+use Google\Ads\GoogleAds\V14\Common\KeywordInfo;
+use Google\Ads\GoogleAds\V14\Common\PlacementInfo;
 use Google\Ads\GoogleAds\V14\Common\RuleBasedUserListInfo;
 use Google\Ads\GoogleAds\V14\Common\UserData;
 use Google\Ads\GoogleAds\V14\Common\UserIdentifier;
@@ -18,6 +20,7 @@ use Google\Ads\GoogleAds\V14\Common\UserListRuleItemGroupInfo;
 use Google\Ads\GoogleAds\V14\Common\UserListRuleItemInfo;
 use Google\Ads\GoogleAds\V14\Common\UserListStringRuleItemInfo;
 use Google\Ads\GoogleAds\V14\Enums\CustomerMatchUploadKeyTypeEnum\CustomerMatchUploadKeyType;
+use Google\Ads\GoogleAds\V14\Enums\KeywordMatchTypeEnum\KeywordMatchType;
 use Google\Ads\GoogleAds\V14\Enums\OfflineUserDataJobStatusEnum\OfflineUserDataJobStatus;
 use Google\Ads\GoogleAds\V14\Enums\OfflineUserDataJobTypeEnum\OfflineUserDataJobType;
 use Google\Ads\GoogleAds\V14\Enums\UserIdentifierSourceEnum\UserIdentifierSource;
@@ -37,6 +40,7 @@ use Google\Ads\GoogleAds\V14\Services\GoogleAdsRow;
 use Google\Ads\GoogleAds\V14\Services\ListAccessibleCustomersResponse;
 use Google\Ads\GoogleAds\V14\Services\MutateUserListResult;
 use Google\Ads\GoogleAds\V14\Services\OfflineUserDataJobOperation;
+use Google\Ads\GoogleAds\V14\Services\SharedCriterionOperation;
 use Google\Ads\GoogleAds\V14\Services\SharedSetOperation;
 use Google\Ads\GoogleAds\V14\Services\UserDataOperation;
 use Google\Ads\GoogleAds\V14\Services\UserListOperation;
@@ -361,7 +365,7 @@ class GoogleAdsService extends AbstractService
     {
         try {
             $data = array_merge($data, [
-                'resource_name' => ResourceNames::forSharedSet($customerClientId, $sharedSetId), // 'customers/{customer_id}/sharedSets/{shared_set_id}
+                'resource_name' => ResourceNames::forSharedSet(strval($customerClientId), strval($sharedSetId)), // 'customers/{customer_id}/sharedSets/{shared_set_id}
             ]);
             $sharedSet = new SharedSet($data);
             $operation = new SharedSetOperation();
@@ -369,6 +373,55 @@ class GoogleAdsService extends AbstractService
             $operation->setUpdateMask(FieldMasks::allSetFieldsOf($sharedSet));
             $response = $this->client->getSharedSetServiceClient()->mutateSharedSets($customerClientId, [$operation]);
             return $response->getResults()[0];
+        } catch (Exception $e) {
+            $err = new CustomError($e->getMessage(), $e->getCode());
+            $this->setCustomError($err);
+            return false;
+        }
+    }
+
+    /**
+     * create shared set criterion
+     *
+     * @param int $customerClientId
+     * @param int $sharedSetId
+     * @param string $type default: [keyword, negativeKeyword, placement]
+     * @param array<int, mixed> $data
+     * @return \Google\Protobuf\Internal\RepeatedField|bool
+     */
+    public function createSharedSetCriterion(int $customerClientId, int $sharedSetId, string $type, array $data): \Google\Protobuf\Internal\RepeatedField|bool
+    {
+        try {
+            $sharedSetResourceName = ResourceNames::forSharedSet(strval($customerClientId), strval($sharedSetId)); // 'customers/{customer_id}/sharedSets/{shared_set_id}
+            $operations = [];
+            foreach ($data as $item) {
+                if ($type === 'keyword') {
+                    $matchType = $item['match_type'] ?? 'broad'; // default: 'broad
+                    $sharedCriterion = new SharedCriterion([
+                        'keyword' => new KeywordInfo([
+                            'text' => $item['text'],
+                            'match_type' => KeywordMatchType::value($item['match_type'])
+                        ]),
+                        'shared_set' => $sharedSetResourceName
+                    ]);
+                } elseif ($type === 'placement') {
+                    $sharedCriterion = new SharedCriterion([
+                        'placement' => new PlacementInfo([
+                            'url' => $item['url']
+                        ]),
+                        'shared_set' => $sharedSetResourceName
+                    ]);
+                } else {
+                    throw new Exception("Invalid type($type)");
+                }
+
+                $operation = new SharedCriterionOperation();
+                $operation->setCreate($sharedCriterion);
+                $operations[] = $operation;
+            }
+
+            $response = $this->client->getSharedCriterionServiceClient()->mutateSharedCriteria($customerClientId, $operations);
+            return $response->getResults();
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
             $this->setCustomError($err);
