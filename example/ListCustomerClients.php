@@ -33,5 +33,26 @@ $rows = $service->listAccessibleCustomers();
 if ($rows === false) {
 	var_dump($service->getCustomError());
 } else {
-	var_dump($rows);
+	foreach($rows as $r) {
+        $custId = $r['id'];
+        $resourceName = $r['resource_name'];
+        $service = $googleAdsServiceBuilder->create([
+            'customerId' => $custId,
+            'refreshToken' => $config['refreshToken']
+        ]);
+        $customer = $service->getCustomer($custId);
+        if ($customer === false) {
+            echo "\nGet Customer $custId, Error";
+        } else {
+            echo sprintf("\nCustomer: %s, ID: %s", $customer->getDescriptiveName(), $customer->getId());
+            $clients = $service->listCustomerClients($custId);
+            if ($clients === false) {
+                echo "\nGet Customer Clients $custId, Error";
+            } else {
+                foreach($clients as $c) {
+                    echo sprintf("\n\tCustomer($custId)'s Client: %s, ID: %s", $c->getCustomerClient()->getDescriptiveName(), $c->getCustomerClient()->getId());
+                }
+            }
+        }
+    }
 }

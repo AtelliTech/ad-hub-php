@@ -70,7 +70,7 @@ class GoogleAdsService extends AbstractService
                 $data = [];
                 foreach($res->getResourceNames() as $resource) {
                     list($category, $id) = explode('/', $resource);
-                    $data[] = ['id'=>intval($id), 'resource'=>$resource];
+                    $data[] = ['id'=>intval($id), 'resource_name'=>$resource];
                 }
 
                 return $data;
@@ -85,16 +85,16 @@ class GoogleAdsService extends AbstractService
     }
 
     /**
-     * Get account
+     * Get customer
      *
      * @param int $customerId
      * @param string[] $fields default: []
      * @return Customer|bool
      */
-    public function getAccount(int $customerId, array $fields = []): Customer|bool
+    public function getCustomer(int $customerId, array $fields = []): Customer|bool
     {
         try {
-            if (!is_array($fields))
+            if (empty($fields))
                 $fields = [
                     'customer.resource_name',
                     'customer.pay_per_conversion_eligibility_failure_reasons',
@@ -123,29 +123,29 @@ class GoogleAdsService extends AbstractService
     }
 
     /**
-     * list customer by root customer id
+     * Get customer client
      *
-     * @param int $rootCustomerId
+     * @param int $customerClientId
      * @param string[] $fields default: []
-     * @return Traversable<int, mixed>|bool
+     * @return CustomerClient|bool
      */
-    public function listCustomers(int $rootCustomerId, array $fields = []): Traversable|bool
+    public function getCustomerClient(int $customerClientId, array $fields = []): CustomerClient|bool
     {
         try {
-            if (empty($fields))
+            if (!is_array($fields))
                 $fields = [
-                    'customer.id',
-                    'customer.manager',
-                    'customer.status',
-                    'customer.resource_name',
-                    'customer.descriptive_name',
-                    'customer.time_zone',
-                    'customer.currency_code',
+                    'customer_client.client_customer',
+                    'customer_client.currency_code',
+                    'customer_client.id',
+                    'customer_client.level',
+                    'customer_client.manager',
+                    'customer_client.resource_name',
+                    'customer_client.time_zone',
+                    'customer_client.descriptive_name',
                 ];
 
-            $query = sprintf('select %s from customer', implode(',', $fields));
-            $stream = $this->queryAll($rootCustomerId, $query);
-            return $stream->iterateAllElements();
+            $query = sprintf('select %s from customer_client limit 1', implode(',', $fields));
+            return $this->queryOne($customerClientId, $query)->getCustomerClient();
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
             $this->setCustomError($err);
@@ -156,11 +156,11 @@ class GoogleAdsService extends AbstractService
     /**
      * list customer client by root customer id
      *
-     * @param int $rootCustomerId
+     * @param int $customerId
      * @param string[] $fields default: []
      * @return Traversable<int, mixed>|bool
      */
-    public function listClients(int $rootCustomerId, array $fields = []): Traversable|bool
+    public function listCustomerClients(int $customerId, array $fields = []): Traversable|bool
     {
         try {
             if (empty($fields))
@@ -176,7 +176,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('select %s from customer_client', implode(',', $fields));
-            $stream = $this->queryAll($rootCustomerId, $query);
+            $stream = $this->queryAll($customerId, $query);
             return $stream->iterateAllElements();
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
@@ -188,11 +188,11 @@ class GoogleAdsService extends AbstractService
     /**
      * list all user lists
      *
-     * @param int $customerId
+     * @param int $customerClientId
      * @param string[] $fields default: []
      * @return Traversable<int, mixed>|bool
      */
-    public function listUserLists(int $customerId, array $fields = []): Traversable|bool
+    public function listUserLists(int $customerClientId, array $fields = []): Traversable|bool
     {
         try {
             if (empty($fields))
@@ -212,7 +212,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM user_list', implode(',', $fields));
-            $stream = $this->queryAll($customerId, $query);
+            $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
@@ -224,11 +224,11 @@ class GoogleAdsService extends AbstractService
     /**
      * list campaign
      *
-     * @param string $customerId
+     * @param int $customerClientId
      * @param string[] $fields default: []
      * @return Traversable<int, mixed>|bool
      */
-    public function listCampaigns(string $customerId, array $fields = []): Traversable|bool
+    public function listCampaigns(int $customerClientId, array $fields = []): Traversable|bool
     {
         try {
             if (empty($fields))
@@ -238,7 +238,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM campaign', implode(',', $fields));
-            $stream = $this->queryAll($query);
+            $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
@@ -250,11 +250,11 @@ class GoogleAdsService extends AbstractService
     /**
      * list submit form data
      *
-     * @param string $customerId
+     * @param int $customerClientId
      * @param string[] $fields default: []
      * @return Traversable<int, mixed>|bool
      */
-    public function listFormData(string $customerId, array $fields = []): Traversable|bool
+    public function listFormData(int $customerClientId, array $fields = []): Traversable|bool
     {
         try {
             if (empty($fields))
@@ -278,7 +278,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM lead_form_submission_data', implode(',', $fields));
-            $stream = $this->queryAll($query);
+            $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());

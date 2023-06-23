@@ -19,30 +19,33 @@ $config = [
 	'clientSecret' => $_ENV['GOOGLE_CLIENT_SECRET'],
 	'developToken' => $_ENV['GOOGLE_DEVELOP_TOKEN'],
 	'apiVersion' => $_ENV['GOOGLE_API_VERSION'],
-	'customerId' => $_ENV['GOOGLE_CUSTOMER_ID'],
+	'rootCustomerId' => $_ENV['GOOGLE_ROOT_CUSTOMER_ID'],
 	'refreshToken' => $_ENV['GOOGLE_REFRESH_TOKEN'],
 ];
 
 $googleAdsServiceBuilder = new GoogleAdsServiceBuilder($config['clientId'], $config['clientSecret'], $config['developToken'], $config['apiVersion']);
 $service = $googleAdsServiceBuilder->create([
-		'customerId' => $config['customerId'],
+		'customerId' => $config['rootCustomerId'],
 		'refreshToken' => $config['refreshToken']
 	]);
 
 $rows = $service->listAccessibleCustomers();
 if ($rows === false) {
-    var_dump($service->getCustomError());
-    exit;
-}
-
-foreach($rows as $r) {
-    echo "\nStart list account by customerId: {$r['id']}\n";
-    $iterator = $service->listClients($r['id']);
-    if ($iterator === false) {
-        echo "\nError: {$r['id']}, {$service->getCustomError()->toString()}";
-    } else {
-        foreach($iterator as $row) {
-            echo sprintf("\nAccount: %s, ID: %s", $row->getCustomerClient()->getDescriptiveName(), $row->getCustomerClient()->getId());
+	var_dump($service->getCustomError());
+} else {
+	foreach($rows as $r) {
+        $custId = $r['id'];
+        $resourceName = $r['resource_name'];
+        $service = $googleAdsServiceBuilder->create([
+            'customerId' => $custId,
+            'refreshToken' => $config['refreshToken']
+        ]);
+        $customer = $service->getCustomer($custId);
+        if ($customer === false) {
+            echo "\nError: {$custId}, {$service->getCustomError()->toString()}";
+            exit;
+        } else {
+            echo sprintf("\nCustomer: %s, ID: %s", $customer->getDescriptiveName(), $customer->getId());
         }
     }
 }

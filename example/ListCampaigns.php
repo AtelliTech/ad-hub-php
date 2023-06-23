@@ -29,20 +29,20 @@ $service = $googleAdsServiceBuilder->create([
 		'refreshToken' => $config['refreshToken']
 	]);
 
-$rows = $service->listAccessibleCustomers();
-if ($rows === false) {
-    var_dump($service->getCustomError());
-    exit;
+$customerClientId = $_ENV['GOOGLE_CUSTOMER_CLIENT_ID'];
+$customerClient = $service->getCustomerClient($customerClientId);
+if ($customerClient === false) {
+    echo "\nGet Customer Client $customerClientId, Error";
+} else {
+    echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
 }
 
-foreach($rows as $r) {
-    echo "\nStart list account by customerId: {$r['id']}\n";
-    $iterator = $service->listCustomers($r['id']);
-    if ($iterator === false) {
-        echo "\nError: {$r['id']}, {$service->getCustomError()->toString()}";
-    } else {
-        foreach($iterator as $row) {
-            echo sprintf("\nAccount: %s, ID: %s", $row->getCustomer()->getDescriptiveName(), $row->getCustomer()->getId());
-        }
+$rows = $service->listCampaigns($customerClientId);
+if ($rows === false) {
+    echo "\nList Campaigns, Error";
+} else {
+    echo "\nList Campaigns:";
+    foreach ($rows as $r) {
+        echo sprintf("\nCampaign: %s, ID: %s", $r->getCampaign()->getName(), $r->getCampaign()->getId());
     }
 }
