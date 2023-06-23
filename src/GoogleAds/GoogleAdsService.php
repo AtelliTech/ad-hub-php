@@ -36,6 +36,7 @@ use Google\Ads\GoogleAds\V14\Resources\UserList;
 use Google\Ads\GoogleAds\V14\Resources\OfflineUserDataJob;
 use Google\Ads\GoogleAds\V14\Resources\SharedCriterion;
 use Google\Ads\GoogleAds\V14\Resources\SharedSet;
+use Google\Ads\GoogleAds\V14\Services\CampaignSharedSetOperation;
 use Google\Ads\GoogleAds\V14\Services\GoogleAdsRow;
 use Google\Ads\GoogleAds\V14\Services\ListAccessibleCustomersResponse;
 use Google\Ads\GoogleAds\V14\Services\MutateUserListResult;
@@ -422,6 +423,34 @@ class GoogleAdsService extends AbstractService
 
             $response = $this->client->getSharedCriterionServiceClient()->mutateSharedCriteria($customerClientId, $operations);
             return $response->getResults();
+        } catch (Exception $e) {
+            $err = new CustomError($e->getMessage(), $e->getCode());
+            $this->setCustomError($err);
+            return false;
+        }
+    }
+
+    /**
+     * create campaign shared set
+     *
+     * @param int $customerClientId
+     * @param int $campaignId
+     * @param int $sharedSetId
+     * @return \Google\Ads\GoogleAds\V14\Services\MutateCampaignSharedSetsResponse|bool
+     */
+    public function createCampaignSharedSet(int $customerClientId, int $campaignId, int $sharedSetId): \Google\Ads\GoogleAds\V14\Services\MutateCampaignSharedSetsResponse|bool
+    {
+        try {
+            $campaignResourceName = ResourceNames::forCampaign(strval($customerClientId), strval($campaignId)); // 'customers/{customer_id}/campaigns/{campaign_id}
+            $sharedSetResourceName = ResourceNames::forSharedSet(strval($customerClientId), strval($sharedSetId)); // 'customers/{customer_id}/sharedSets/{shared_set_id}
+            $campaignSharedSet = new CampaignSharedSet([
+                'campaign' => $campaignResourceName,
+                'shared_set' => $sharedSetResourceName
+            ]);
+            $operation = new CampaignSharedSetOperation();
+            $operation->setCreate($campaignSharedSet);
+            $response = $this->client->getCampaignSharedSetServiceClient()->mutateCampaignSharedSets($customerClientId, [$operation]);
+            return $response->getResults()[0];
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
             $this->setCustomError($err);
