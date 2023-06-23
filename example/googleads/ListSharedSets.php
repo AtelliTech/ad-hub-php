@@ -9,18 +9,18 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $config = [
-	'clientId' => $_ENV['GOOGLE_CLIENT_ID'],
-	'clientSecret' => $_ENV['GOOGLE_CLIENT_SECRET'],
-	'developToken' => $_ENV['GOOGLE_DEVELOP_TOKEN'],
-	'apiVersion' => $_ENV['GOOGLE_API_VERSION'],
-	'customerId' => $_ENV['GOOGLE_CUSTOMER_ID'],
-	'refreshToken' => $_ENV['GOOGLE_REFRESH_TOKEN'],
+	'clientId' => $_ENV['CLIENT_ID'],
+	'clientSecret' => $_ENV['CLIENT_SECRET'],
+	'developToken' => $_ENV['DEVELOP_TOKEN'],
+	'apiVersion' => $_ENV['API_VERSION'],
+	'customerId' => $_ENV['CUSTOMER_ID'],
+	'refreshToken' => $_ENV['REFRESH_TOKEN'],
 ];
 
 $googleAdsServiceBuilder = new GoogleAdsServiceBuilder($config['clientId'], $config['clientSecret'], $config['developToken'], $config['apiVersion']);
@@ -29,7 +29,7 @@ $service = $googleAdsServiceBuilder->create([
 		'refreshToken' => $config['refreshToken']
 	]);
 
-$customerClientId = $_ENV['GOOGLE_CUSTOMER_CLIENT_ID'];
+$customerClientId = $_ENV['CUSTOMER_CLIENT_ID'];
 $customerClient = $service->getCustomerClient($customerClientId);
 if ($customerClient === false) {
     echo "\nGet Customer Client $customerClientId, Error";
@@ -37,12 +37,12 @@ if ($customerClient === false) {
     echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
 }
 
-$rows = $service->listCampaigns($customerClientId);
+$rows = $service->listSharedSets($customerClientId);
 if ($rows === false) {
-    echo "\nList Campaigns, Error";
+    echo "\nList Shared Sets, Error, " . $service->getCustomError()->toString();
 } else {
-    echo "\nList Campaigns:";
+    echo "\nList Shared Sets:";
     foreach ($rows as $r) {
-        echo sprintf("\nCampaign: %s, ID: %s", $r->getCampaign()->getName(), $r->getCampaign()->getId());
+        echo sprintf("\nShared Set: %s, ID: %s, Status: %s", $r->getSharedSet()->getName(), $r->getSharedSet()->getId(), $r->getSharedSet()->getStatus());
     }
 }

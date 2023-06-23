@@ -17,16 +17,6 @@ use Google\Ads\GoogleAds\V14\Common\UserListRuleInfo;
 use Google\Ads\GoogleAds\V14\Common\UserListRuleItemGroupInfo;
 use Google\Ads\GoogleAds\V14\Common\UserListRuleItemInfo;
 use Google\Ads\GoogleAds\V14\Common\UserListStringRuleItemInfo;
-use Google\Ads\GoogleAds\V14\Resources\Customer;
-use Google\Ads\GoogleAds\V14\Resources\CustomerClient;
-use Google\Ads\GoogleAds\V14\Resources\UserList;
-use Google\Ads\GoogleAds\V14\Resources\OfflineUserDataJob;
-use Google\Ads\GoogleAds\V14\Services\GoogleAdsRow;
-use Google\Ads\GoogleAds\V14\Services\ListAccessibleCustomersResponse;
-use Google\Ads\GoogleAds\V14\Services\MutateUserListResult;
-use Google\Ads\GoogleAds\V14\Services\OfflineUserDataJobOperation;
-use Google\Ads\GoogleAds\V14\Services\UserListOperation;
-use Google\Ads\GoogleAds\V14\Services\UserDataOperation;
 use Google\Ads\GoogleAds\V14\Enums\CustomerMatchUploadKeyTypeEnum\CustomerMatchUploadKeyType;
 use Google\Ads\GoogleAds\V14\Enums\OfflineUserDataJobStatusEnum\OfflineUserDataJobStatus;
 use Google\Ads\GoogleAds\V14\Enums\OfflineUserDataJobTypeEnum\OfflineUserDataJobType;
@@ -35,6 +25,22 @@ use Google\Ads\GoogleAds\V14\Enums\UserListMembershipStatusEnum\UserListMembersh
 use Google\Ads\GoogleAds\V14\Enums\UserListPrepopulationStatusEnum\UserListPrepopulationStatus;
 use Google\Ads\GoogleAds\V14\Enums\UserListRuleTypeEnum\UserListRuleType;
 use Google\Ads\GoogleAds\V14\Enums\UserListStringRuleItemOperatorEnum\UserListStringRuleItemOperator;
+use Google\Ads\GoogleAds\V14\Enums\SharedSetTypeEnum\SharedSetType;
+use Google\Ads\GoogleAds\V14\Resources\CampaignSharedSet;
+use Google\Ads\GoogleAds\V14\Resources\Customer;
+use Google\Ads\GoogleAds\V14\Resources\CustomerClient;
+use Google\Ads\GoogleAds\V14\Resources\UserList;
+use Google\Ads\GoogleAds\V14\Resources\OfflineUserDataJob;
+use Google\Ads\GoogleAds\V14\Resources\SharedCriterion;
+use Google\Ads\GoogleAds\V14\Resources\SharedSet;
+use Google\Ads\GoogleAds\V14\Services\GoogleAdsRow;
+use Google\Ads\GoogleAds\V14\Services\ListAccessibleCustomersResponse;
+use Google\Ads\GoogleAds\V14\Services\MutateUserListResult;
+use Google\Ads\GoogleAds\V14\Services\OfflineUserDataJobOperation;
+use Google\Ads\GoogleAds\V14\Services\SharedSetOperation;
+use Google\Ads\GoogleAds\V14\Services\UserDataOperation;
+use Google\Ads\GoogleAds\V14\Services\UserListOperation;
+use Google\Ads\GoogleAds\Util\V14\ResourceNames;
 use Google\Protobuf\FieldMask;
 use Google\Ads\GoogleAds\Util\FieldMasks;
 use Traversable;
@@ -132,7 +138,7 @@ class GoogleAdsService extends AbstractService
     public function getCustomerClient(int $customerClientId, array $fields = []): CustomerClient|bool
     {
         try {
-            if (!is_array($fields))
+            if (empty($fields))
                 $fields = [
                     'customer_client.client_customer',
                     'customer_client.currency_code',
@@ -280,6 +286,89 @@ class GoogleAdsService extends AbstractService
             $query = sprintf('SELECT %s FROM lead_form_submission_data', implode(',', $fields));
             $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
+        } catch (Exception $e) {
+            $err = new CustomError($e->getMessage(), $e->getCode());
+            $this->setCustomError($err);
+            return false;
+        }
+    }
+
+    /**
+     * list all shared set
+     *
+     * @param int $customerClientId
+     * @param string[] $fields default: []
+     * @return Traversable<int, mixed>|bool
+     */
+    public function listSharedSets(int $customerClientId, array $fields = []): Traversable|bool
+    {
+        try {
+            if (empty($fields))
+                $fields = [
+                    'shared_set.id',
+                    'shared_set.name',
+                    'shared_set.resource_name',
+                    'shared_set.status',
+                    'shared_set.type',
+                    'shared_set.member_count',
+                    'shared_set.reference_count'
+                ];
+
+            $query = sprintf('SELECT %s FROM shared_set', implode(',', $fields));
+            $stream = $this->queryAll($customerClientId, $query);
+            return $stream->iterateAllElements();
+        } catch (Exception $e) {
+            $err = new CustomError($e->getMessage(), $e->getCode());
+            $this->setCustomError($err);
+            return false;
+        }
+    }
+
+    /**
+     * create shared set
+     *
+     * @param int $customerClientId
+     * @param array<string, mixed> $data
+     * @return \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+     */
+    public function createSharedSet(int $customerClientId, array $data): \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+    {
+        try {
+            $sharedSet = new SharedSet([
+                'name' => $data['name'],
+                'type' => SharedSetType::value($data['type'])
+            ]);
+            $operation = new SharedSetOperation();
+            $operation->setCreate($sharedSet);
+            $response = $this->client->getSharedSetServiceClient()->mutateSharedSets($customerClientId, [$operation]);
+            return $response->getResults()[0];
+        } catch (Exception $e) {
+            $err = new CustomError($e->getMessage(), $e->getCode());
+            $this->setCustomError($err);
+            return false;
+        }
+    }
+
+    /**
+     * update shared set
+     *
+     * @param int $customerClientId
+     * @param int $sharedSetId
+     * @param array<string, mixed> $data
+     * @return \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+     */
+    public function updateSharedSet(int $customerClientId, int $sharedSetId, array $data): \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+    {
+        try {
+            $data = array_merge($data, [
+                'resource_name' => ResourceNames::forSharedSet($customerClientId, $sharedSetId), // 'customers/{customer_id}/sharedSets/{shared_set_id}
+            ]);
+            $sharedSet = new SharedSet($data);
+            $operation = new SharedSetOperation();
+            $operation->setUpdate($sharedSet);
+            $operation->setUpdateMask(FieldMasks::allSetFieldsOf($sharedSet));
+            $response = $this->client->getSharedSetServiceClient()->mutateSharedSets($customerClientId, [$operation]);
+            return $response->getResults()[0];
         } catch (Exception $e) {
             $err = new CustomError($e->getMessage(), $e->getCode());
             $this->setCustomError($err);
