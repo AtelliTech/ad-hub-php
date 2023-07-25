@@ -464,7 +464,7 @@ class GoogleAdsService extends AbstractService
      * @param int $customerId
      * @return GoogleAdsRow
      */
-    private function queryOne(int $customerId, string $query): GoogleAdsRow|null
+    public function queryOne(int $customerId, string $query): GoogleAdsRow|null
     {
         return $this->client->getGoogleAdsServiceClient()->search($customerId, $query)
                                                          ->getIterator()
@@ -477,7 +477,7 @@ class GoogleAdsService extends AbstractService
      * @param int $customerId
      * @return GoogleAdsServerStreamDecorator
      */
-    private function queryAll(int $customerId, string $query): GoogleAdsServerStreamDecorator
+    public function queryAll(int $customerId, string $query): GoogleAdsServerStreamDecorator
     {
         return $this->client->getGoogleAdsServiceClient()->searchStream($customerId, $query);
     }
