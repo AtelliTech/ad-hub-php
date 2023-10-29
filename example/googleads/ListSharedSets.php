@@ -39,7 +39,7 @@ if ($customerClient === false) {
 
 $rows = $service->listSharedSets($customerClientId);
 if ($rows === false) {
-    echo "\nList Shared Sets, Error, " . $service->getCustomError()->toString();
+    echo "\nList Shared Sets, Error, ";
 } else {
     echo "\nList Shared Sets:";
     foreach ($rows as $r) {

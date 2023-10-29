@@ -10,20 +10,12 @@ namespace AtelliTech\AdHub;
 abstract class AbstractService
 {
     /**
-     * Custom error
-     *
-     * @var CustomError
-     */
-    protected CustomError $customError;
-
-    /**
      * construct
      *
      * @param mixed $client
-     * @param string $apiVersion
      * @return void
      */
-    public function __construct(protected $client, protected string $apiVersion)
+    public function __construct(protected $client)
     {}
 
     /**
@@ -34,28 +26,6 @@ abstract class AbstractService
     abstract public function getName(): string;
 
     /**
-     * Get Custom Error
-     *
-     * @return CustomError
-     */
-    public function getCustomError(): CustomError
-    {
-        return $this->customError;
-    }
-
-    /**
-     * Set Custom Error
-     *
-     * @param CustomError $customError
-     * @return self
-     */
-    public function setCustomError(CustomError $customError): self
-    {
-        $this->customError = $customError;
-        return $this;
-    }
-
-    /**
      * Get client
      *
      * @return mixed
@@ -63,15 +33,5 @@ abstract class AbstractService
     public function getClient()
     {
         return $this->client;
-    }
-
-    /**
-     * Get API version
-     *
-     * @return string
-     */
-    public function getApiVersion(): string
-    {
-        return $this->apiVersion;
     }
 }

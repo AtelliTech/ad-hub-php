@@ -32,7 +32,7 @@ $service = $googleAdsServiceBuilder->create([
 $customerClientId = $_ENV['CUSTOMER_CLIENT_ID'];
 $customerClient = $service->getCustomerClient($customerClientId);
 if ($customerClient === false) {
-    echo "\nGet Customer Client $customerClientId, Error! " . $service->getCustomError()->toString();
+    echo "\nGet Customer Client $customerClientId, Error! ";
     exit;
 } else {
     echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
@@ -45,7 +45,7 @@ $sharedSet = $service->createSharedSet($customerClientId, [
         'type' => $type
     ]);
 if ($sharedSet === false) {
-    echo "\nCreate Shared Set, Error, " . $service->getCustomError()->toString();
+    echo "\nCreate Shared Set, Error, ";
 } else {
     echo sprintf("\nCreate Shared Set: %s", $sharedSet->getResourceName());
 }

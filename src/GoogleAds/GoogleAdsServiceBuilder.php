@@ -54,7 +54,7 @@ class GoogleAdsServiceBuilder extends AbstractServiceBuilder
                                                            ->withLoginCustomerId($customerId)
                                                            ->build();
 
-            return new GoogleAdsService($googleAdsClient, $this->apiVersion);
+            return new GoogleAdsService($googleAdsClient);
         } catch (Exception $e) {
             throw $e;
         }
