@@ -31,7 +31,8 @@ $service = $googleAdsServiceBuilder->create([
 
 $rows = $service->listAccessibleCustomers();
 if ($rows === false) {
-	var_dump($service->getCustomError());
+	echo "\nError: listAccessibleCustomers";
+    exit;
 } else {
 	foreach($rows as $r) {
         $custId = $r['id'];
@@ -42,7 +43,7 @@ if ($rows === false) {
         ]);
         $customer = $service->getCustomer($custId);
         if ($customer === false) {
-            echo "\nError: {$custId}, {$service->getCustomError()->toString()}";
+            echo "\nError: {$custId}";
             exit;
         } else {
             echo sprintf("\nCustomer: %s, ID: %s", $customer->getDescriptiveName(), $customer->getId());

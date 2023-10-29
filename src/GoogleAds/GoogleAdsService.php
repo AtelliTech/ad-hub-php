@@ -3,7 +3,6 @@
 namespace AtelliTech\AdHub\GoogleAds;
 
 use AtelliTech\AdHub\AbstractService;
-use AtelliTech\AdHub\CustomError;
 use Exception;
 use Google\ApiCore\ApiException;
 use Google\Ads\GoogleAds\Lib\V14\GoogleAdsServerStreamDecorator;
@@ -49,6 +48,7 @@ use Google\Ads\GoogleAds\Util\V14\ResourceNames;
 use Google\Protobuf\FieldMask;
 use Google\Ads\GoogleAds\Util\FieldMasks;
 use Traversable;
+use Throwable;
 
 /**
  * This service is used to access GoogleAds Resources. Almost returned data are refering to Resource class of GoogleAds API.
@@ -88,10 +88,8 @@ class GoogleAdsService extends AbstractService
             }
 
             throw new Exception("Invalid response of listAccessibleCustomers of GoogleAdsService", 500);
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -126,10 +124,8 @@ class GoogleAdsService extends AbstractService
 
             $query = sprintf('select %s from customer limit 1', implode(',', $fields));
             return $this->queryOne($customerId, $query)->getCustomer();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -157,10 +153,8 @@ class GoogleAdsService extends AbstractService
 
             $query = sprintf('select %s from customer_client limit 1', implode(',', $fields));
             return $this->queryOne($customerClientId, $query)->getCustomerClient();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -189,10 +183,8 @@ class GoogleAdsService extends AbstractService
             $query = sprintf('select %s from customer_client', implode(',', $fields));
             $stream = $this->queryAll($customerId, $query);
             return $stream->iterateAllElements();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -225,10 +217,8 @@ class GoogleAdsService extends AbstractService
             $query = sprintf('SELECT %s FROM user_list', implode(',', $fields));
             $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -251,10 +241,8 @@ class GoogleAdsService extends AbstractService
             $query = sprintf('SELECT %s FROM campaign', implode(',', $fields));
             $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -291,10 +279,8 @@ class GoogleAdsService extends AbstractService
             $query = sprintf('SELECT %s FROM lead_form_submission_data', implode(',', $fields));
             $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -322,10 +308,8 @@ class GoogleAdsService extends AbstractService
             $query = sprintf('SELECT %s FROM shared_set', implode(',', $fields));
             $stream = $this->queryAll($customerClientId, $query);
             return $stream->iterateAllElements();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -347,10 +331,8 @@ class GoogleAdsService extends AbstractService
             $operation->setCreate($sharedSet);
             $response = $this->client->getSharedSetServiceClient()->mutateSharedSets($customerClientId, [$operation]);
             return $response->getResults()[0];
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -374,10 +356,8 @@ class GoogleAdsService extends AbstractService
             $operation->setUpdateMask(FieldMasks::allSetFieldsOf($sharedSet));
             $response = $this->client->getSharedSetServiceClient()->mutateSharedSets($customerClientId, [$operation]);
             return $response->getResults()[0];
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -423,10 +403,8 @@ class GoogleAdsService extends AbstractService
 
             $response = $this->client->getSharedCriterionServiceClient()->mutateSharedCriteria($customerClientId, $operations);
             return $response->getResults();
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
@@ -451,10 +429,8 @@ class GoogleAdsService extends AbstractService
             $operation->setCreate($campaignSharedSet);
             $response = $this->client->getCampaignSharedSetServiceClient()->mutateCampaignSharedSets($customerClientId, [$operation]);
             return $response->getResults()[0];
-        } catch (Exception $e) {
-            $err = new CustomError($e->getMessage(), $e->getCode());
-            $this->setCustomError($err);
-            return false;
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
         }
     }
 
