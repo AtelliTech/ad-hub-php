@@ -29,9 +29,9 @@ class FacebookServiceBuilder extends AbstractServiceBuilder
      * create service after create google ads client
      *
      * @param array<string, mixed> $options
-     * @return AbstractService
+     * @return FacebookService
      */
-    public function create(array $options): AbstractService
+    public function create(array $options): FacebookService
     {
         $accessToken = $options['accessToken'] ?? null;
         if (empty($accessToken))

@@ -26,8 +26,7 @@ class FacebookService extends AbstractService
     /**
      * list accessible businesses
      *
-     * @param string $fields
-     * @param array<string, mixed> $options
+     * @param array<string, mixed> $params
      * @return array<int, mixed>
      */
     public function listAccessibleBusinesses(array $params = []): array

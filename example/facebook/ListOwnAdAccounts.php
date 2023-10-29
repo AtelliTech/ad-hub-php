@@ -28,7 +28,7 @@ $service = $builder->create([
 $after = null;
 $businesses = [];
 while(1) {
-    if ($after) {
+    if ($after != null) {
         $params = ['after' => $after];
     } else {
         $params = [];

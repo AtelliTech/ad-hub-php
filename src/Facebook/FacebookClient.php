@@ -47,9 +47,9 @@ class FacebookClient
      * @param string $method
      * @param string $path
      * @param array<string, mixed> $options
-     * @return mixed
+     * @return array<string|int, mixed>
      */
-    public function request(string $method, string $path, array $options = [])
+    public function request(string $method, string $path, array $options = []): array
     {
         $endpoint = sprintf('/%s/%s', $this->apiVersion, ltrim($path, '/'));
         $client = new Client([
