@@ -30,9 +30,4 @@ $service = $googleAdsServiceBuilder->create([
 	]);
 
 $rows = $service->listAccessibleCustomers();
-if ($rows === false) {
-	echo "\nError: listAccessibleCustomers";
-	exit;
-} else {
-	var_dump($rows);
-}
+var_dump($rows);

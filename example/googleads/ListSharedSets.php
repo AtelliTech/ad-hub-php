@@ -31,18 +31,10 @@ $service = $googleAdsServiceBuilder->create([
 
 $customerClientId = $_ENV['CUSTOMER_CLIENT_ID'];
 $customerClient = $service->getCustomerClient($customerClientId);
-if ($customerClient === false) {
-    echo "\nGet Customer Client $customerClientId, Error";
-} else {
-    echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
-}
+echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
 
-$rows = $service->listSharedSets($customerClientId);
-if ($rows === false) {
-    echo "\nList Shared Sets, Error, ";
-} else {
-    echo "\nList Shared Sets:";
-    foreach ($rows as $r) {
-        echo sprintf("\nShared Set: %s, ID: %s, Status: %s", $r->getSharedSet()->getName(), $r->getSharedSet()->getId(), $r->getSharedSet()->getStatus());
-    }
+$stream = $service->listSharedSets($customerClientId);
+echo "\nList Shared Sets:";
+foreach ($stream->iterateAllElements() as $r) {
+	echo sprintf("\nShared Set: %s, ID: %s, Status: %s", $r->getSharedSet()->getName(), $r->getSharedSet()->getId(), $r->getSharedSet()->getStatus());
 }

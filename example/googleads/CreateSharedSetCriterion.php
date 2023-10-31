@@ -31,12 +31,7 @@ $service = $googleAdsServiceBuilder->create([
 
 $customerClientId = $_ENV['CUSTOMER_CLIENT_ID'];
 $customerClient = $service->getCustomerClient($customerClientId);
-if ($customerClient === false) {
-    echo "\nGet Customer Client $customerClientId, Error! ";
-    exit;
-} else {
-    echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
-}
+echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
 
 $sharedSetId = $_ENV['SHARED_SET_ID'];
 $data = [
@@ -44,11 +39,6 @@ $data = [
     ['url'=>'https://www.abc.com'],
 ];
 $results = $service->createSharedSetCriterion($customerClientId, $sharedSetId, 'placement', $data);
-if ($results === false) {
-    echo "\nCreate Shared Set Criterion, Error! ";
-    exit;
-} else {
-    foreach ($results as $result) {
-        echo sprintf("\nShared Set Criterion: %s", $result->getResourceName());
-    }
+foreach ($results as $result) {
+    echo sprintf("\nShared Set Criterion: %s", $result->getResourceName());
 }
