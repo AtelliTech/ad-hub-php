@@ -4,8 +4,9 @@ namespace AtelliTech\AdHub\GoogleAds;
 
 use AtelliTech\AdHub\AbstractService;
 use Exception;
-use Google\ApiCore\ApiException;
 use Google\Ads\GoogleAds\Lib\V15\GoogleAdsServerStreamDecorator;
+use Google\Ads\GoogleAds\Util\FieldMasks;
+use Google\Ads\GoogleAds\Util\V15\ResourceNames;
 use Google\Ads\GoogleAds\V15\Common\CrmBasedUserListInfo;
 use Google\Ads\GoogleAds\V15\Common\CustomerMatchUserListMetadata;
 use Google\Ads\GoogleAds\V15\Common\ExpressionRuleUserListInfo;
@@ -22,33 +23,39 @@ use Google\Ads\GoogleAds\V15\Enums\CustomerMatchUploadKeyTypeEnum\CustomerMatchU
 use Google\Ads\GoogleAds\V15\Enums\KeywordMatchTypeEnum\KeywordMatchType;
 use Google\Ads\GoogleAds\V15\Enums\OfflineUserDataJobStatusEnum\OfflineUserDataJobStatus;
 use Google\Ads\GoogleAds\V15\Enums\OfflineUserDataJobTypeEnum\OfflineUserDataJobType;
+use Google\Ads\GoogleAds\V15\Enums\SharedSetTypeEnum\SharedSetType;
 use Google\Ads\GoogleAds\V15\Enums\UserIdentifierSourceEnum\UserIdentifierSource;
 use Google\Ads\GoogleAds\V15\Enums\UserListMembershipStatusEnum\UserListMembershipStatus;
 use Google\Ads\GoogleAds\V15\Enums\UserListPrepopulationStatusEnum\UserListPrepopulationStatus;
 use Google\Ads\GoogleAds\V15\Enums\UserListRuleTypeEnum\UserListRuleType;
 use Google\Ads\GoogleAds\V15\Enums\UserListStringRuleItemOperatorEnum\UserListStringRuleItemOperator;
-use Google\Ads\GoogleAds\V15\Enums\SharedSetTypeEnum\SharedSetType;
 use Google\Ads\GoogleAds\V15\Resources\CampaignSharedSet;
 use Google\Ads\GoogleAds\V15\Resources\Customer;
 use Google\Ads\GoogleAds\V15\Resources\CustomerClient;
-use Google\Ads\GoogleAds\V15\Resources\UserList;
 use Google\Ads\GoogleAds\V15\Resources\OfflineUserDataJob;
 use Google\Ads\GoogleAds\V15\Resources\SharedCriterion;
 use Google\Ads\GoogleAds\V15\Resources\SharedSet;
+use Google\Ads\GoogleAds\V15\Resources\UserList;
 use Google\Ads\GoogleAds\V15\Services\CampaignSharedSetOperation;
 use Google\Ads\GoogleAds\V15\Services\GoogleAdsRow;
+use Google\Ads\GoogleAds\V15\Services\ListAccessibleCustomersRequest;
 use Google\Ads\GoogleAds\V15\Services\ListAccessibleCustomersResponse;
+use Google\Ads\GoogleAds\V15\Services\MutateCampaignSharedSetsResponse;
+use Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult;
 use Google\Ads\GoogleAds\V15\Services\MutateUserListResult;
 use Google\Ads\GoogleAds\V15\Services\OfflineUserDataJobOperation;
+use Google\Ads\GoogleAds\V15\Services\SearchGoogleAdsRequest;
+use Google\Ads\GoogleAds\V15\Services\SearchGoogleAdsStreamRequest;
 use Google\Ads\GoogleAds\V15\Services\SharedCriterionOperation;
 use Google\Ads\GoogleAds\V15\Services\SharedSetOperation;
 use Google\Ads\GoogleAds\V15\Services\UserDataOperation;
 use Google\Ads\GoogleAds\V15\Services\UserListOperation;
-use Google\Ads\GoogleAds\Util\V15\ResourceNames;
+use Google\ApiCore\PagedListResponse;
+use Google\ApiCore\ServerStream;
 use Google\Protobuf\FieldMask;
-use Google\Ads\GoogleAds\Util\FieldMasks;
-use Traversable;
+use Google\Protobuf\Internal\RepeatedField;
 use Throwable;
+use Traversable;
 
 /**
  * This service is used to access GoogleAds Resources. Almost returned data are refering to Resource class of GoogleAds API.
@@ -71,25 +78,22 @@ class GoogleAdsService extends AbstractService
     /**
      * listAccessibleCustomers
      *
-     * @return array<int, mixed>|bool
+     * @return array<int, array{id:int, resource_name:string}>
      */
-    public function listAccessibleCustomers(): array|bool
+    public function listAccessibleCustomers(): array
     {
         try {
             $res = $this->client->getCustomerServiceClient()->listAccessibleCustomers();
-            if ($res instanceof ListAccessibleCustomersResponse) {
-                $data = [];
-                foreach($res->getResourceNames() as $resource) {
-                    list($category, $id) = explode('/', $resource);
-                    $data[] = ['id'=>intval($id), 'resource_name'=>$resource];
-                }
 
-                return $data;
+            $data = [];
+            foreach($res->getResourceNames() as $resource) {
+                list($category, $id) = explode('/', $resource);
+                $data[] = ['id'=>intval($id), 'resource_name'=>$resource];
             }
 
-            throw new Exception("Invalid response of listAccessibleCustomers of GoogleAdsService", 500);
+            return $data;
         } catch (Throwable $e) {
-            throw new Exception($e->getMessage(), 500, $e);
+            throw new Exception("Invalid response of listAccessibleCustomers of GoogleAdsService", 500, $e);
         }
     }
 
@@ -98,9 +102,9 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerId
      * @param string[] $fields default: []
-     * @return Customer|bool
+     * @return Customer
      */
-    public function getCustomer(int $customerId, array $fields = []): Customer|bool
+    public function getCustomer(int $customerId, array $fields = []): Customer
     {
         try {
             if (empty($fields))
@@ -123,7 +127,9 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('select %s from customer limit 1', implode(',', $fields));
-            return $this->queryOne($customerId, $query)->getCustomer();
+            return $this->query($customerId, $query)->getIterator()
+                                                    ->current()
+                                                    ->getCustomer();
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -134,9 +140,9 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param string[] $fields default: []
-     * @return CustomerClient|bool
+     * @return CustomerClient
      */
-    public function getCustomerClient(int $customerClientId, array $fields = []): CustomerClient|bool
+    public function getCustomerClient(int $customerClientId, array $fields = []): CustomerClient
     {
         try {
             if (empty($fields))
@@ -152,7 +158,9 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('select %s from customer_client limit 1', implode(',', $fields));
-            return $this->queryOne($customerClientId, $query)->getCustomerClient();
+            return $this->query($customerClientId, $query)->getIterator()
+                                                          ->current()
+                                                          ->getCustomerClient();
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -163,9 +171,10 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerId
      * @param string[] $fields default: []
-     * @return Traversable<int, mixed>|bool
+     * @param array<string, mixed> $options default: []
+     * @return ServerStream
      */
-    public function listCustomerClients(int $customerId, array $fields = []): Traversable|bool
+    public function listCustomerClients(int $customerId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields))
@@ -181,8 +190,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('select %s from customer_client', implode(',', $fields));
-            $stream = $this->queryAll($customerId, $query);
-            return $stream->iterateAllElements();
+            return $this->queryStream($customerId, $query, $options);
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -193,9 +201,10 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param string[] $fields default: []
-     * @return Traversable<int, mixed>|bool
+     * @param array<string, mixed> $options default: []
+     * @return ServerStream
      */
-    public function listUserLists(int $customerClientId, array $fields = []): Traversable|bool
+    public function listUserLists(int $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields))
@@ -215,8 +224,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM user_list', implode(',', $fields));
-            $stream = $this->queryAll($customerClientId, $query);
-            return $stream->iterateAllElements();
+            return $this->queryStream($customerClientId, $query, $options);
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -227,9 +235,10 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param string[] $fields default: []
-     * @return Traversable<int, mixed>|bool
+     * @param array<string, mixed> $options default: []
+     * @return ServerStream
      */
-    public function listCampaigns(int $customerClientId, array $fields = []): Traversable|bool
+    public function listCampaigns(int $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields))
@@ -239,8 +248,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM campaign', implode(',', $fields));
-            $stream = $this->queryAll($customerClientId, $query);
-            return $stream->iterateAllElements();
+            return $this->queryStream($customerClientId, $query, $options);
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -251,9 +259,10 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param string[] $fields default: []
-     * @return Traversable<int, mixed>|bool
+     * @param array<string, mixed> $options default: []
+     * @return ServerStream
      */
-    public function listFormData(int $customerClientId, array $fields = []): Traversable|bool
+    public function listFormData(int $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields))
@@ -277,8 +286,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM lead_form_submission_data', implode(',', $fields));
-            $stream = $this->queryAll($customerClientId, $query);
-            return $stream->iterateAllElements();
+            return $this->queryStream($customerClientId, $query, $options);
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -289,9 +297,10 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param string[] $fields default: []
-     * @return Traversable<int, mixed>|bool
+     * @param array<string, mixed> $options default: []
+     * @return ServerStream
      */
-    public function listSharedSets(int $customerClientId, array $fields = []): Traversable|bool
+    public function listSharedSets(int $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields))
@@ -306,8 +315,7 @@ class GoogleAdsService extends AbstractService
                 ];
 
             $query = sprintf('SELECT %s FROM shared_set', implode(',', $fields));
-            $stream = $this->queryAll($customerClientId, $query);
-            return $stream->iterateAllElements();
+            return $this->queryStream($customerClientId, $query, $options);
         } catch (Throwable $e) {
             throw new Exception($e->getMessage(), 500, $e);
         }
@@ -318,9 +326,9 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param array<string, mixed> $data
-     * @return \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
+     * @return MutateSharedSetResult
      */
-    public function createSharedSet(int $customerClientId, array $data): \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
+    public function createSharedSet(int $customerClientId, array $data): MutateSharedSetResult
     {
         try {
             $sharedSet = new SharedSet([
@@ -342,9 +350,9 @@ class GoogleAdsService extends AbstractService
      * @param int $customerClientId
      * @param int $sharedSetId
      * @param array<string, mixed> $data
-     * @return \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
+     * @return MutateSharedSetResult|bool
      */
-    public function updateSharedSet(int $customerClientId, int $sharedSetId, array $data): \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
+    public function updateSharedSet(int $customerClientId, int $sharedSetId, array $data): MutateSharedSetResult|bool
     {
         try {
             $data = array_merge($data, [
@@ -368,9 +376,9 @@ class GoogleAdsService extends AbstractService
      * @param int $sharedSetId
      * @param string $type default: [keyword, negativeKeyword, placement]
      * @param array<int, mixed> $data
-     * @return \Google\Protobuf\Internal\RepeatedField|bool
+     * @return RepeatedField|bool
      */
-    public function createSharedSetCriterion(int $customerClientId, int $sharedSetId, string $type, array $data): \Google\Protobuf\Internal\RepeatedField|bool
+    public function createSharedSetCriterion(int $customerClientId, int $sharedSetId, string $type, array $data): RepeatedField|bool
     {
         try {
             $sharedSetResourceName = ResourceNames::forSharedSet(strval($customerClientId), strval($sharedSetId)); // 'customers/{customer_id}/sharedSets/{shared_set_id}
@@ -414,9 +422,9 @@ class GoogleAdsService extends AbstractService
      * @param int $customerClientId
      * @param int $campaignId
      * @param int $sharedSetId
-     * @return \Google\Ads\GoogleAds\V15\Services\MutateCampaignSharedSetsResponse|bool
+     * @return MutateCampaignSharedSetsResponse
      */
-    public function createCampaignSharedSet(int $customerClientId, int $campaignId, int $sharedSetId): \Google\Ads\GoogleAds\V15\Services\MutateCampaignSharedSetsResponse|bool
+    public function createCampaignSharedSet(int $customerClientId, int $campaignId, int $sharedSetId): MutateCampaignSharedSetsResponse
     {
         try {
             $campaignResourceName = ResourceNames::forCampaign(strval($customerClientId), strval($campaignId)); // 'customers/{customer_id}/campaigns/{campaign_id}
@@ -435,26 +443,28 @@ class GoogleAdsService extends AbstractService
     }
 
     /**
-     * find one
+     * query result
      *
      * @param int $customerId
-     * @return GoogleAdsRow
+     * @param string $query
+     * @param array<string, mixed> $options
+     * @return PagedListResponse
      */
-    public function queryOne(int $customerId, string $query): GoogleAdsRow|null
+    public function query(int $customerId, string $query, array $options = []): PagedListResponse
     {
-        return $this->client->getGoogleAdsServiceClient()->search($customerId, $query)
-                                                         ->getIterator()
-                                                         ->current();
+        return $this->client->getGoogleAdsServiceClient()->search($customerId, $query, $options);
     }
 
     /**
-     * find all
+     * query result by stream
      *
      * @param int $customerId
-     * @return GoogleAdsServerStreamDecorator
+     * @param string $query
+     * @param array<string, mixed> $options
+     * @return ServerStream
      */
-    public function queryAll(int $customerId, string $query): GoogleAdsServerStreamDecorator
+    public function queryStream(int $customerId, string $query, array $options = []): ServerStream
     {
-        return $this->client->getGoogleAdsServiceClient()->searchStream($customerId, $query);
+        return $this->client->getGoogleAdsServiceClient()->searchStream($customerId, $query, $options);
     }
 }

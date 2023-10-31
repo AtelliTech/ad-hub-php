@@ -30,37 +30,26 @@ $service = $googleAdsServiceBuilder->create([
 	]);
 
 $rows = $service->listAccessibleCustomers();
-if ($rows === false) {
-	echo "\nError: listAccessibleCustomers";
-    exit;
-} else {
-	foreach($rows as $r) {
-        $custId = $r['id'];
-        $resourceName = $r['resource_name'];
-        $service = $googleAdsServiceBuilder->create([
-            'customerId' => $custId,
-            'refreshToken' => $config['refreshToken']
-        ]);
+foreach($rows as $r) {
+    $custId = $r['id'];
+    $resourceName = $r['resource_name'];
+    $service = $googleAdsServiceBuilder->create([
+        'customerId' => $custId,
+        'refreshToken' => $config['refreshToken']
+    ]);
 
-        try {
-            $customer = $service->getCustomer($custId);
-        } catch (\Throwable $e) {
-            $customer = false;
-            echo "\nGet Customer $custId, Error: " . $e->getMessage() . "\n";
-        }
+    try {
+        $customer = $service->getCustomer($custId);
+    } catch (\Throwable $e) {
+        echo "\nGet Customer $custId, Error: " . $e->getMessage() . "\n";
+        continue;
+    }
 
-        if ($customer === false) {
-            continue;
-        } else {
-            echo sprintf("\nCustomer: %s, ID: %s", $customer->getDescriptiveName(), $customer->getId());
-            $clients = $service->listCustomerClients($custId);
-            if ($clients === false) {
-                echo "\nGet Customer Clients $custId, Error";
-            } else {
-                foreach($clients as $c) {
-                    echo sprintf("\n\tCustomer($custId)'s Client: %s, ID: %s", $c->getCustomerClient()->getDescriptiveName(), $c->getCustomerClient()->getId());
-                }
-            }
-        }
+    echo sprintf("\nCustomer: %s, ID: %s", $customer->getDescriptiveName(), $customer->getId());
+    $stream = $service->listCustomerClients($custId);
+
+    // list customer clients by stream
+    foreach($stream->iterateAllElements() as $r) {
+        echo sprintf("\n\tCustomer($custId)'s Client: %s, ID: %s", $r->getCustomerClient()->getDescriptiveName(), $r->getCustomerClient()->getId());
     }
 }

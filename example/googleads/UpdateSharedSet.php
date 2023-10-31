@@ -31,12 +31,7 @@ $service = $googleAdsServiceBuilder->create([
 
 $customerClientId = $_ENV['CUSTOMER_CLIENT_ID'];
 $customerClient = $service->getCustomerClient($customerClientId);
-if ($customerClient === false) {
-    echo "\nGet Customer Client $customerClientId, Error! ";
-    exit;
-} else {
-    echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
-}
+echo sprintf("\nCustomer Client: %s, ID: %s", $customerClient->getDescriptiveName(), $customerClient->getId());
 
 $sharedSetId = $_ENV['SHARED_SET_ID'];
 $name = 'test exclude placements';
@@ -44,8 +39,4 @@ $type = 'NEGATIVE_PLACEMENTS';
 $sharedSet = $service->updateSharedSet($customerClientId, $sharedSetId, [
         'name' => $name
     ]);
-if ($sharedSet === false) {
-    echo "\nUpdate Shared Set, Error, ";
-} else {
-    echo sprintf("\nUpdate Shared Set: %s", $sharedSet->getResourceName());
-}
+echo sprintf("\nUpdate Shared Set: %s", $sharedSet->getResourceName());

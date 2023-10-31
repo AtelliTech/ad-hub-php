@@ -52,6 +52,7 @@ class GoogleAdsServiceBuilder extends AbstractServiceBuilder
             $googleAdsClient = (new GoogleAdsClientBuilder)->withOAuth2Credential($oAuth2Credential)
                                                            ->withDeveloperToken($this->developToken)
                                                            ->withLoginCustomerId($customerId)
+                                                        //    ->usingGapicV2Source(true)
                                                            ->build();
 
             return new GoogleAdsService($googleAdsClient);
