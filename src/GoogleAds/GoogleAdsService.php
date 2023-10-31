@@ -5,46 +5,46 @@ namespace AtelliTech\AdHub\GoogleAds;
 use AtelliTech\AdHub\AbstractService;
 use Exception;
 use Google\ApiCore\ApiException;
-use Google\Ads\GoogleAds\Lib\V14\GoogleAdsServerStreamDecorator;
-use Google\Ads\GoogleAds\V14\Common\CrmBasedUserListInfo;
-use Google\Ads\GoogleAds\V14\Common\CustomerMatchUserListMetadata;
-use Google\Ads\GoogleAds\V14\Common\ExpressionRuleUserListInfo;
-use Google\Ads\GoogleAds\V14\Common\KeywordInfo;
-use Google\Ads\GoogleAds\V14\Common\PlacementInfo;
-use Google\Ads\GoogleAds\V14\Common\RuleBasedUserListInfo;
-use Google\Ads\GoogleAds\V14\Common\UserData;
-use Google\Ads\GoogleAds\V14\Common\UserIdentifier;
-use Google\Ads\GoogleAds\V14\Common\UserListRuleInfo;
-use Google\Ads\GoogleAds\V14\Common\UserListRuleItemGroupInfo;
-use Google\Ads\GoogleAds\V14\Common\UserListRuleItemInfo;
-use Google\Ads\GoogleAds\V14\Common\UserListStringRuleItemInfo;
-use Google\Ads\GoogleAds\V14\Enums\CustomerMatchUploadKeyTypeEnum\CustomerMatchUploadKeyType;
-use Google\Ads\GoogleAds\V14\Enums\KeywordMatchTypeEnum\KeywordMatchType;
-use Google\Ads\GoogleAds\V14\Enums\OfflineUserDataJobStatusEnum\OfflineUserDataJobStatus;
-use Google\Ads\GoogleAds\V14\Enums\OfflineUserDataJobTypeEnum\OfflineUserDataJobType;
-use Google\Ads\GoogleAds\V14\Enums\UserIdentifierSourceEnum\UserIdentifierSource;
-use Google\Ads\GoogleAds\V14\Enums\UserListMembershipStatusEnum\UserListMembershipStatus;
-use Google\Ads\GoogleAds\V14\Enums\UserListPrepopulationStatusEnum\UserListPrepopulationStatus;
-use Google\Ads\GoogleAds\V14\Enums\UserListRuleTypeEnum\UserListRuleType;
-use Google\Ads\GoogleAds\V14\Enums\UserListStringRuleItemOperatorEnum\UserListStringRuleItemOperator;
-use Google\Ads\GoogleAds\V14\Enums\SharedSetTypeEnum\SharedSetType;
-use Google\Ads\GoogleAds\V14\Resources\CampaignSharedSet;
-use Google\Ads\GoogleAds\V14\Resources\Customer;
-use Google\Ads\GoogleAds\V14\Resources\CustomerClient;
-use Google\Ads\GoogleAds\V14\Resources\UserList;
-use Google\Ads\GoogleAds\V14\Resources\OfflineUserDataJob;
-use Google\Ads\GoogleAds\V14\Resources\SharedCriterion;
-use Google\Ads\GoogleAds\V14\Resources\SharedSet;
-use Google\Ads\GoogleAds\V14\Services\CampaignSharedSetOperation;
-use Google\Ads\GoogleAds\V14\Services\GoogleAdsRow;
-use Google\Ads\GoogleAds\V14\Services\ListAccessibleCustomersResponse;
-use Google\Ads\GoogleAds\V14\Services\MutateUserListResult;
-use Google\Ads\GoogleAds\V14\Services\OfflineUserDataJobOperation;
-use Google\Ads\GoogleAds\V14\Services\SharedCriterionOperation;
-use Google\Ads\GoogleAds\V14\Services\SharedSetOperation;
-use Google\Ads\GoogleAds\V14\Services\UserDataOperation;
-use Google\Ads\GoogleAds\V14\Services\UserListOperation;
-use Google\Ads\GoogleAds\Util\V14\ResourceNames;
+use Google\Ads\GoogleAds\Lib\V15\GoogleAdsServerStreamDecorator;
+use Google\Ads\GoogleAds\V15\Common\CrmBasedUserListInfo;
+use Google\Ads\GoogleAds\V15\Common\CustomerMatchUserListMetadata;
+use Google\Ads\GoogleAds\V15\Common\ExpressionRuleUserListInfo;
+use Google\Ads\GoogleAds\V15\Common\KeywordInfo;
+use Google\Ads\GoogleAds\V15\Common\PlacementInfo;
+use Google\Ads\GoogleAds\V15\Common\RuleBasedUserListInfo;
+use Google\Ads\GoogleAds\V15\Common\UserData;
+use Google\Ads\GoogleAds\V15\Common\UserIdentifier;
+use Google\Ads\GoogleAds\V15\Common\UserListRuleInfo;
+use Google\Ads\GoogleAds\V15\Common\UserListRuleItemGroupInfo;
+use Google\Ads\GoogleAds\V15\Common\UserListRuleItemInfo;
+use Google\Ads\GoogleAds\V15\Common\UserListStringRuleItemInfo;
+use Google\Ads\GoogleAds\V15\Enums\CustomerMatchUploadKeyTypeEnum\CustomerMatchUploadKeyType;
+use Google\Ads\GoogleAds\V15\Enums\KeywordMatchTypeEnum\KeywordMatchType;
+use Google\Ads\GoogleAds\V15\Enums\OfflineUserDataJobStatusEnum\OfflineUserDataJobStatus;
+use Google\Ads\GoogleAds\V15\Enums\OfflineUserDataJobTypeEnum\OfflineUserDataJobType;
+use Google\Ads\GoogleAds\V15\Enums\UserIdentifierSourceEnum\UserIdentifierSource;
+use Google\Ads\GoogleAds\V15\Enums\UserListMembershipStatusEnum\UserListMembershipStatus;
+use Google\Ads\GoogleAds\V15\Enums\UserListPrepopulationStatusEnum\UserListPrepopulationStatus;
+use Google\Ads\GoogleAds\V15\Enums\UserListRuleTypeEnum\UserListRuleType;
+use Google\Ads\GoogleAds\V15\Enums\UserListStringRuleItemOperatorEnum\UserListStringRuleItemOperator;
+use Google\Ads\GoogleAds\V15\Enums\SharedSetTypeEnum\SharedSetType;
+use Google\Ads\GoogleAds\V15\Resources\CampaignSharedSet;
+use Google\Ads\GoogleAds\V15\Resources\Customer;
+use Google\Ads\GoogleAds\V15\Resources\CustomerClient;
+use Google\Ads\GoogleAds\V15\Resources\UserList;
+use Google\Ads\GoogleAds\V15\Resources\OfflineUserDataJob;
+use Google\Ads\GoogleAds\V15\Resources\SharedCriterion;
+use Google\Ads\GoogleAds\V15\Resources\SharedSet;
+use Google\Ads\GoogleAds\V15\Services\CampaignSharedSetOperation;
+use Google\Ads\GoogleAds\V15\Services\GoogleAdsRow;
+use Google\Ads\GoogleAds\V15\Services\ListAccessibleCustomersResponse;
+use Google\Ads\GoogleAds\V15\Services\MutateUserListResult;
+use Google\Ads\GoogleAds\V15\Services\OfflineUserDataJobOperation;
+use Google\Ads\GoogleAds\V15\Services\SharedCriterionOperation;
+use Google\Ads\GoogleAds\V15\Services\SharedSetOperation;
+use Google\Ads\GoogleAds\V15\Services\UserDataOperation;
+use Google\Ads\GoogleAds\V15\Services\UserListOperation;
+use Google\Ads\GoogleAds\Util\V15\ResourceNames;
 use Google\Protobuf\FieldMask;
 use Google\Ads\GoogleAds\Util\FieldMasks;
 use Traversable;
@@ -318,9 +318,9 @@ class GoogleAdsService extends AbstractService
      *
      * @param int $customerClientId
      * @param array<string, mixed> $data
-     * @return \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+     * @return \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
      */
-    public function createSharedSet(int $customerClientId, array $data): \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+    public function createSharedSet(int $customerClientId, array $data): \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
     {
         try {
             $sharedSet = new SharedSet([
@@ -342,9 +342,9 @@ class GoogleAdsService extends AbstractService
      * @param int $customerClientId
      * @param int $sharedSetId
      * @param array<string, mixed> $data
-     * @return \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+     * @return \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
      */
-    public function updateSharedSet(int $customerClientId, int $sharedSetId, array $data): \Google\Ads\GoogleAds\V14\Services\MutateSharedSetResult|bool
+    public function updateSharedSet(int $customerClientId, int $sharedSetId, array $data): \Google\Ads\GoogleAds\V15\Services\MutateSharedSetResult|bool
     {
         try {
             $data = array_merge($data, [
@@ -414,9 +414,9 @@ class GoogleAdsService extends AbstractService
      * @param int $customerClientId
      * @param int $campaignId
      * @param int $sharedSetId
-     * @return \Google\Ads\GoogleAds\V14\Services\MutateCampaignSharedSetsResponse|bool
+     * @return \Google\Ads\GoogleAds\V15\Services\MutateCampaignSharedSetsResponse|bool
      */
-    public function createCampaignSharedSet(int $customerClientId, int $campaignId, int $sharedSetId): \Google\Ads\GoogleAds\V14\Services\MutateCampaignSharedSetsResponse|bool
+    public function createCampaignSharedSet(int $customerClientId, int $campaignId, int $sharedSetId): \Google\Ads\GoogleAds\V15\Services\MutateCampaignSharedSetsResponse|bool
     {
         try {
             $campaignResourceName = ResourceNames::forCampaign(strval($customerClientId), strval($campaignId)); // 'customers/{customer_id}/campaigns/{campaign_id}
