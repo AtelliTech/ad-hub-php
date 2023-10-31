@@ -41,9 +41,16 @@ if ($rows === false) {
             'customerId' => $custId,
             'refreshToken' => $config['refreshToken']
         ]);
-        $customer = $service->getCustomer($custId);
+
+        try {
+            $customer = $service->getCustomer($custId);
+        } catch (\Throwable $e) {
+            $customer = false;
+            echo "\nGet Customer $custId, Error: " . $e->getMessage() . "\n";
+        }
+
         if ($customer === false) {
-            echo "\nGet Customer $custId, Error";
+            continue;
         } else {
             echo sprintf("\nCustomer: %s, ID: %s", $customer->getDescriptiveName(), $customer->getId());
             $clients = $service->listCustomerClients($custId);

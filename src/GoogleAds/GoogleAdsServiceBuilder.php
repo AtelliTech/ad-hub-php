@@ -6,7 +6,7 @@ use AtelliTech\AdHub\AbstractService;
 use AtelliTech\AdHub\AbstractServiceBuilder;
 use Exception;
 use Google\Ads\GoogleAds\Lib\OAuth2TokenBuilder;
-use Google\Ads\GoogleAds\Lib\V14\GoogleAdsClientBuilder;
+use Google\Ads\GoogleAds\Lib\V15\GoogleAdsClientBuilder;
 
 /**
  * This class is a service build for GoogleAds
