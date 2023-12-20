@@ -293,6 +293,31 @@ class GoogleAdsService extends AbstractService
     }
 
     /**
+     * list forms
+     *
+     * @param int $customerClientId
+     * @param string[] $fields default: []
+     * @param array<string, mixed> $options default: []
+     * @return ServerStream
+     */
+    public function listForms(int $customerClientId, array $fields = [], array $options = []): ServerStream
+    {
+        try {
+            if (empty($fields))
+                $fields = [
+                    'asset.id',
+                    'asset.name',
+                    'asset.lead_form_asset.headline'
+                ];
+
+            $query = sprintf('SELECT %s FROM asset WHERE asset.type="LEAD_FORM"', implode(',', $fields));
+            return $this->queryStream($customerClientId, $query, $options);
+        } catch (Throwable $e) {
+            throw new Exception($e->getMessage(), 500, $e);
+        }
+    }
+
+    /**
      * list all shared set
      *
      * @param int $customerClientId
