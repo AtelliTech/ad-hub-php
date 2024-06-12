@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0a5edfc6a3b1b02b06342ebf11f092b",
+    "content-hash": "1e6ef30da38c6ff06acefa90668bb63b",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -369,24 +369,24 @@
         },
         {
             "name": "googleads/google-ads-php",
-            "version": "v21.1.0",
+            "version": "v23.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleads/google-ads-php.git",
-                "reference": "d60ce0aaf773b054bd3c7b3e6e6baa9710246238"
+                "reference": "68ced4c6268ff1f4ec037a575246f300675bb7f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleads/google-ads-php/zipball/d60ce0aaf773b054bd3c7b3e6e6baa9710246238",
-                "reference": "d60ce0aaf773b054bd3c7b3e6e6baa9710246238",
+                "url": "https://api.github.com/repos/googleads/google-ads-php/zipball/68ced4c6268ff1f4ec037a575246f300675bb7f1",
+                "reference": "68ced4c6268ff1f4ec037a575246f300675bb7f1",
                 "shasum": ""
             },
             "require": {
                 "google/gax": "^1.19.1",
-                "google/protobuf": "^3.21.5",
+                "google/protobuf": "^3.21.5 || ^4.26",
                 "grpc/grpc": "^1.36.0",
                 "monolog/monolog": "^1.26 || ^2.0 || ^3.0",
-                "php": ">=8.0"
+                "php": ">=8.1"
             },
             "require-dev": {
                 "composer/composer": "^2.0",
@@ -426,9 +426,9 @@
             "homepage": "https://github.com/googleads/google-ads-php",
             "support": {
                 "issues": "https://github.com/googleads/google-ads-php/issues",
-                "source": "https://github.com/googleads/google-ads-php/tree/v21.1.0"
+                "source": "https://github.com/googleads/google-ads-php/tree/v23.1.0"
             },
-            "time": "2023-10-19T18:19:08+00:00"
+            "time": "2024-06-07T16:51:37+00:00"
         },
         {
             "name": "graham-campbell/result-type",
