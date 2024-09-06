@@ -69,6 +69,8 @@ class FacebookClient
                 $options['form_params'] = array_merge(['access_token' => $this->accessToken], $options['form_params']);
             elseif (isset($options['json']) && is_array($options['json']))
                 $options['json'] = array_merge(['access_token' => $this->accessToken], $options['json']);
+            elseif (isset($options['multipart'] ) && is_array($options['multipart']))
+                $options['multipart'][] = ['name' => 'access_token', 'contents' => $this->accessToken];
             else
                 throw new Exception('Parameter error of mentod POST');
         } else {
