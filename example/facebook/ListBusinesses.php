@@ -2,54 +2,25 @@
 
 namespace Example;
 
-use AtelliTech\AdHub\Facebook\FacebookServiceBuilder;
+use AtelliTech\Ads\Facebook\FacebookService;
 use Dotenv\Dotenv;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__.'/../../vendor/autoload.php';
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $config = [
-	'clientId' => $_ENV['CLIENT_ID'],
-	'clientSecret' => $_ENV['CLIENT_SECRET'],
-	'apiVersion' => $_ENV['API_VERSION']
+    'clientId' => $_ENV['CLIENT_ID'],
+    'clientSecret' => $_ENV['CLIENT_SECRET'],
+    'version' => $_ENV['API_VERSION'],
+    'accessToken' => $_ENV['ACCESS_TOKEN'],
 ];
 
-$builder = new FacebookServiceBuilder($config['clientId'], $config['clientSecret'], $config['apiVersion']);
-$service = $builder->create([
-		'accessToken' => $_ENV['ACCESS_TOKEN']
-	]);
-
-$after = null;
-while(1) {
-    if ($after) {
-        $params = ['after' => $after];
-    } else {
-        $params = [];
-    }
-
-    $result = $service->listAccessibleBusinesses($params);
-    if (isset($result['error'])) {
-        echo $result['error']['message'];
-        exit;
-    }
-
-    var_dump($result['data']);
-
-    $paging = $result['paging'] ?? null;
-    if ($paging) {
-        $cursors = $paging['cursors'] ?? null;
-        if ($cursors) {
-            $after = $cursors['after'] ?? null;
-        }
-    }
-
-    if (count($result['data']) < 25) {
-        break;
-    }
-}
+$service = FacebookService::create($config);
+$result = $service->listAccessibleBusinesses();
+var_dump($result);

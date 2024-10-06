@@ -1,20 +1,32 @@
 <?php
 
-namespace AtelliTech\AdHub\Facebook;
+namespace AtelliTech\Ads\Facebook;
 
-use AtelliTech\AdHub\AbstractService;
+use AtelliTech\Ads\AbstractService;
 use Throwable;
 
 /**
  * This service is used to access Facebook Resources. Almost returned data are refering to Resource class of Facebook API.
  *
  * @see https://developers.facebook.com/docs/marketing-api/reference
+ *
  * @author Eric Huang <eric.huang@atelli.ai>
  */
 class FacebookService extends AbstractService
 {
     /**
-     * Get service name
+     * create service.
+     *
+     * @param array<string, mixed> $config
+     * @return self
+     */
+    public static function create(array $config): self
+    {
+        return new self(new FacebookClient($config));
+    }
+
+    /**
+     * Get service name.
      *
      * @return string
      */
@@ -24,10 +36,10 @@ class FacebookService extends AbstractService
     }
 
     /**
-     * list accessible businesses
+     * list accessible businesses.
      *
      * @param array<string, mixed> $params
-     * @return array<int, mixed>
+     * @return array<string, mixed>
      */
     public function listAccessibleBusinesses(array $params = []): array
     {
@@ -35,17 +47,18 @@ class FacebookService extends AbstractService
 
         $defaultQuery = ['fields' => 'id,name'];
         $options = [
-            'query' => array_merge($defaultQuery, $params)
+            'query' => array_merge($defaultQuery, $params),
         ];
-        return $this->request('GET', $path, $options);
+
+        return $this->client->get($path, $options);
     }
 
     /**
-     * query own ads accounts by particular business id
+     * query own ads accounts by particular business id.
      *
      * @param string $id
      * @param array<string, mixed> $params
-     * @return array<int, mixed>
+     * @return array<string, mixed>
      */
     public function listOwnAdsAccounts(string $id, array $params = []): array
     {
@@ -53,17 +66,18 @@ class FacebookService extends AbstractService
 
         $defaultQuery = ['fields' => 'id,name'];
         $options = [
-            'query' => array_merge($defaultQuery, $params)
+            'query' => array_merge($defaultQuery, $params),
         ];
-        return $this->request('GET', $path, $options);
+
+        return $this->client->get($path, $options);
     }
 
     /**
-     * list client ad accounts
+     * list client ad accounts.
      *
      * @param string $id business id
      * @param array<string, mixed> $params
-     * @return array<int, mixed>
+     * @return array<string, mixed>
      */
     public function listClientAdAccounts(string $id, array $params = []): array
     {
@@ -71,23 +85,24 @@ class FacebookService extends AbstractService
 
         $defaultQuery = ['fields' => 'id,name'];
         $options = [
-            'query' => array_merge($defaultQuery, $params)
+            'query' => array_merge($defaultQuery, $params),
         ];
-        return $this->request('GET', $path, $options);
+
+        return $this->client->get($path, $options);
     }
 
     /**
-     * send request
+     * send request.
      *
      * @param string $method
      * @param string $path
      * @param array<string, mixed> $options
-     * @return array<string|int, mixed>
+     * @return array<int|string, mixed>
      */
     public function request(string $method, string $path, array $options = []): array
     {
         try {
-            return $this->getClient()->request($method, $path, $options);
+            return $this->client->request($method, $path, $options);
         } catch (Throwable $e) {
             throw $e;
         }

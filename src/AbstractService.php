@@ -1,6 +1,6 @@
 <?php
 
-namespace AtelliTech\AdHub;
+namespace AtelliTech\Ads;
 
 /**
  * This is an abstract service, every service class must extend this class.
@@ -10,23 +10,15 @@ namespace AtelliTech\AdHub;
 abstract class AbstractService
 {
     /**
-     * construct
+     * construct.
      *
      * @param mixed $client
      * @return void
      */
-    public function __construct(protected $client)
-    {}
+    public function __construct(protected mixed $client) {}
 
     /**
-     * Get service name
-     *
-     * @return string
-     */
-    abstract public function getName(): string;
-
-    /**
-     * Get client
+     * Get client.
      *
      * @return mixed
      */
@@ -34,4 +26,19 @@ abstract class AbstractService
     {
         return $this->client;
     }
+
+    /**
+     * Get service name.
+     *
+     * @return string
+     */
+    abstract public function getName(): string;
+
+    /**
+     * create service.
+     *
+     * @param array<string, mixed> $config
+     * @return self
+     */
+    abstract public static function create(array $config): self;
 }
