@@ -41,9 +41,9 @@ class GoogleAdsService extends AbstractService
      * create service.
      *
      * @param array<string, mixed> $config
-     * @return self
+     * @return static
      */
-    public static function create(array $config): self
+    public static function create(array $config): static
     {
         $names = ['customerId', 'refreshToken', 'clientId', 'clientSecret', 'developToken'];
         foreach ($names as $name) {
@@ -64,7 +64,7 @@ class GoogleAdsService extends AbstractService
             ->withLoginCustomerId($config['customerId'])
             ->build();
 
-        return new self($googleAdsClient);
+        return new static($googleAdsClient); // @phpstan-ignore-line
     }
 
     /**

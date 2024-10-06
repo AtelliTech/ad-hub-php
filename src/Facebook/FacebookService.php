@@ -18,11 +18,11 @@ class FacebookService extends AbstractService
      * create service.
      *
      * @param array<string, mixed> $config
-     * @return self
+     * @return static
      */
-    public static function create(array $config): self
+    public static function create(array $config): static
     {
-        return new self(new FacebookClient($config));
+        return new static(new FacebookClient($config));  // @phpstan-ignore-line
     }
 
     /**
