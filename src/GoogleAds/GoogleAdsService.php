@@ -21,6 +21,8 @@ use Google\Ads\GoogleAds\V17\Services\CampaignSharedSetOperation;
 use Google\Ads\GoogleAds\V17\Services\ListAccessibleCustomersRequest;
 use Google\Ads\GoogleAds\V17\Services\MutateCampaignSharedSetsResponse;
 use Google\Ads\GoogleAds\V17\Services\MutateSharedSetResult;
+use Google\Ads\GoogleAds\V17\Services\SearchGoogleAdsRequest;
+use Google\Ads\GoogleAds\V17\Services\SearchGoogleAdsStreamRequest;
 use Google\Ads\GoogleAds\V17\Services\SharedCriterionOperation;
 use Google\Ads\GoogleAds\V17\Services\SharedSetOperation;
 use Google\ApiCore\PagedListResponse;
@@ -102,11 +104,11 @@ class GoogleAdsService extends AbstractService
     /**
      * Get customer.
      *
-     * @param int $customerId
+     * @param string $customerId
      * @param string[] $fields default: []
      * @return Customer
      */
-    public function getCustomer(int $customerId, array $fields = []): Customer
+    public function getCustomer(string $customerId, array $fields = []): Customer
     {
         try {
             if (empty($fields)) {
@@ -142,11 +144,11 @@ class GoogleAdsService extends AbstractService
     /**
      * Get customer client.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param string[] $fields default: []
      * @return CustomerClient
      */
-    public function getCustomerClient(int $customerClientId, array $fields = []): CustomerClient
+    public function getCustomerClient(string $customerClientId, array $fields = []): CustomerClient
     {
         try {
             if (empty($fields)) {
@@ -175,12 +177,12 @@ class GoogleAdsService extends AbstractService
     /**
      * list customer client by root customer id.
      *
-     * @param int $customerId
+     * @param string $customerId
      * @param string[] $fields default: []
      * @param array<string, mixed> $options default: []
      * @return ServerStream
      */
-    public function listCustomerClients(int $customerId, array $fields = [], array $options = []): ServerStream
+    public function listCustomerClients(string $customerId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields)) {
@@ -207,12 +209,12 @@ class GoogleAdsService extends AbstractService
     /**
      * list all user lists.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param string[] $fields default: []
      * @param array<string, mixed> $options default: []
      * @return ServerStream
      */
-    public function listUserLists(int $customerClientId, array $fields = [], array $options = []): ServerStream
+    public function listUserLists(string $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields)) {
@@ -243,12 +245,12 @@ class GoogleAdsService extends AbstractService
     /**
      * list campaign.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param string[] $fields default: []
      * @param array<string, mixed> $options default: []
      * @return ServerStream
      */
-    public function listCampaigns(int $customerClientId, array $fields = [], array $options = []): ServerStream
+    public function listCampaigns(string $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields)) {
@@ -269,12 +271,12 @@ class GoogleAdsService extends AbstractService
     /**
      * list submit form data.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param string[] $fields default: []
      * @param array<string, mixed> $options default: []
      * @return ServerStream
      */
-    public function listFormData(int $customerClientId, array $fields = [], array $options = []): ServerStream
+    public function listFormData(string $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields)) {
@@ -309,12 +311,12 @@ class GoogleAdsService extends AbstractService
     /**
      * list forms.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param string[] $fields default: []
      * @param array<string, mixed> $options default: []
      * @return ServerStream
      */
-    public function listForms(int $customerClientId, array $fields = [], array $options = []): ServerStream
+    public function listForms(string $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields)) {
@@ -336,12 +338,12 @@ class GoogleAdsService extends AbstractService
     /**
      * list all shared set.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param string[] $fields default: []
      * @param array<string, mixed> $options default: []
      * @return ServerStream
      */
-    public function listSharedSets(int $customerClientId, array $fields = [], array $options = []): ServerStream
+    public function listSharedSets(string $customerClientId, array $fields = [], array $options = []): ServerStream
     {
         try {
             if (empty($fields)) {
@@ -367,11 +369,11 @@ class GoogleAdsService extends AbstractService
     /**
      * create shared set.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param array<string, mixed> $data
      * @return MutateSharedSetResult
      */
-    public function createSharedSet(int $customerClientId, array $data): MutateSharedSetResult
+    public function createSharedSet(string $customerClientId, array $data): MutateSharedSetResult
     {
         try {
             $sharedSet = new SharedSet([
@@ -391,12 +393,12 @@ class GoogleAdsService extends AbstractService
     /**
      * update shared set.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param int $sharedSetId
      * @param array<string, mixed> $data
      * @return bool|MutateSharedSetResult
      */
-    public function updateSharedSet(int $customerClientId, int $sharedSetId, array $data): bool|MutateSharedSetResult
+    public function updateSharedSet(string $customerClientId, int $sharedSetId, array $data): bool|MutateSharedSetResult
     {
         try {
             $data = array_merge($data, [
@@ -417,13 +419,13 @@ class GoogleAdsService extends AbstractService
     /**
      * create shared set criterion.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param int $sharedSetId
      * @param string $type default: [keyword, negativeKeyword, placement]
      * @param array<int, mixed> $data
      * @return bool|RepeatedField
      */
-    public function createSharedSetCriterion(int $customerClientId, int $sharedSetId, string $type, array $data): bool|RepeatedField
+    public function createSharedSetCriterion(string $customerClientId, int $sharedSetId, string $type, array $data): bool|RepeatedField
     {
         try {
             $sharedSetResourceName = ResourceNames::forSharedSet(strval($customerClientId), strval($sharedSetId)); // 'customers/{customer_id}/sharedSets/{shared_set_id}
@@ -465,12 +467,12 @@ class GoogleAdsService extends AbstractService
     /**
      * create campaign shared set.
      *
-     * @param int $customerClientId
+     * @param string $customerClientId
      * @param int $campaignId
      * @param int $sharedSetId
      * @return MutateCampaignSharedSetsResponse
      */
-    public function createCampaignSharedSet(int $customerClientId, int $campaignId, int $sharedSetId): MutateCampaignSharedSetsResponse
+    public function createCampaignSharedSet(string $customerClientId, int $campaignId, int $sharedSetId): MutateCampaignSharedSetsResponse
     {
         try {
             $campaignResourceName = ResourceNames::forCampaign(strval($customerClientId), strval($campaignId)); // 'customers/{customer_id}/campaigns/{campaign_id}
@@ -492,26 +494,30 @@ class GoogleAdsService extends AbstractService
     /**
      * query result.
      *
-     * @param int $customerId
+     * @param string $customerId
      * @param string $query
      * @param array<string, mixed> $options
      * @return PagedListResponse
      */
-    public function query(int $customerId, string $query, array $options = []): PagedListResponse
+    public function query(string $customerId, string $query, array $options = []): PagedListResponse
     {
-        return $this->client->getGoogleAdsServiceClient()->search($customerId, $query, $options);
+        $req = SearchGoogleAdsRequest::build($customerId, $query);
+
+        return $this->client->getGoogleAdsServiceClient()->search($req);
     }
 
     /**
      * query result by stream.
      *
-     * @param int $customerId
+     * @param string $customerId
      * @param string $query
      * @param array<string, mixed> $options
      * @return ServerStream
      */
-    public function queryStream(int $customerId, string $query, array $options = []): ServerStream
+    public function queryStream(string $customerId, string $query, array $options = []): ServerStream
     {
-        return $this->client->getGoogleAdsServiceClient()->searchStream($customerId, $query, $options);
+        $req = SearchGoogleAdsStreamRequest::build($customerId, $query);
+
+        return $this->client->getGoogleAdsServiceClient()->searchStream($req);
     }
 }
