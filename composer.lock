@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a55dc2c3cd20c61c3a718d5c716bca83",
+    "content-hash": "394e30ed3b21758dd41a1599a7d61032",
     "packages": [
         {
             "name": "brick/math",
@@ -440,16 +440,16 @@
         },
         {
             "name": "googleads/google-ads-php",
-            "version": "v23.1.0",
+            "version": "v25.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleads/google-ads-php.git",
-                "reference": "68ced4c6268ff1f4ec037a575246f300675bb7f1"
+                "reference": "6f37249dcb0da6485cc38e74f5e3cc00e4400a4f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleads/google-ads-php/zipball/68ced4c6268ff1f4ec037a575246f300675bb7f1",
-                "reference": "68ced4c6268ff1f4ec037a575246f300675bb7f1",
+                "url": "https://api.github.com/repos/googleads/google-ads-php/zipball/6f37249dcb0da6485cc38e74f5e3cc00e4400a4f",
+                "reference": "6f37249dcb0da6485cc38e74f5e3cc00e4400a4f",
                 "shasum": ""
             },
             "require": {
@@ -497,9 +497,9 @@
             "homepage": "https://github.com/googleads/google-ads-php",
             "support": {
                 "issues": "https://github.com/googleads/google-ads-php/issues",
-                "source": "https://github.com/googleads/google-ads-php/tree/v23.1.0"
+                "source": "https://github.com/googleads/google-ads-php/tree/v25.0.0"
             },
-            "time": "2024-06-07T16:51:37+00:00"
+            "time": "2024-10-18T08:01:40+00:00"
         },
         {
             "name": "grpc/grpc",

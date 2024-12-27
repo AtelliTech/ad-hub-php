@@ -15,7 +15,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
-        "googleads/google-ads-php": "^23.1",
+        "googleads/google-ads-php": "^25.0",
         "guzzlehttp/guzzle": "^7.0"
     },
     "autoload": {
