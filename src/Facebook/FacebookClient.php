@@ -81,7 +81,7 @@ class FacebookClient
         try {
             $response = $client->request($method, $endpoint, $options);
         } catch (Throwable $e) {
-            echo "\nMessage: " . $e->getMessage();
+            // echo "\nMessage: " . $e->getMessage();
             throw new Exception($e->getMessage(), $e->getCode(), $e);
         }
 
