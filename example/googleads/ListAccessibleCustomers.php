@@ -26,3 +26,5 @@ $service = GoogleAdsService::create($config);
 
 $rows = $service->listAccessibleCustomers();
 var_dump($rows);
+$customer = $service->getCustomer($_ENV['CUSTOMER_CLIENT_ID']);
+var_dump($customer);
